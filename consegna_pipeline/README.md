@@ -1,11 +1,12 @@
-# Pipeline partite — JSON → Parquet → DuckDB
+# Pipeline partite: JSON → Parquet → DuckDB
 
 Trasforma i JSON delle partite in dati puliti, tipizzati e interrogabili.
 È **incrementale**: rieseguire elabora solo le partite nuove o cambiate.
+Garanzia di **idempotenza**.
 
 ## Come si esegue
 
-Richiede **Python 3.9+** (su macOS lancia con `python3`, non `python`).
+Richiede **Python 3.9+**.
 
 Comando unico, multipiattaforma (installa le dipendenze e fa tutto in fila):
 
@@ -26,13 +27,15 @@ python3 run.py --query     # solo le domande di esempio + metrica xG
 python3 run.py --verify    # rilegge il magazzino e ri-asserisce le invarianti
 
 streamlit run app.py       # dashboard interattiva nel browser
-python3 charts/charts.py   # genera i grafici (PNG) in charts/output/
+python3 charts/charts.py   # genera alcuni grafici interessanti (PNG) in charts/output/
 ```
 
-## Dashboard (interfaccia)
+## Dashboard (interfaccia) per l'interrogazione
 
 `streamlit run app.py` apre **Viola Analytics**: la dashboard di design (servita da
-`static/`, file autosufficiente) incorporata e alimentata dai nostri dati. Flusso:
+`static/`, file autosufficiente) incorporata e alimentata dai nostri dati. 
+
+Flusso:
 **1)** scarica il CSV (generato al volo da DuckDB sui Parquet puliti), **2)** trascinalo
 nell'area di caricamento della dashboard. Il CSV è rigenerato dal magazzino a ogni
 apertura — nessun dato duplicato, una sola fonte di verità.
@@ -40,7 +43,7 @@ apertura — nessun dato duplicato, una sola fonte di verità.
 I dati di default sono cercati in `../candidate_dataset/data`.
 Per puntare altrove: `CALCIO_DATA=/percorso/data python3 run.py --initial`.
 
-## Cosa produce
+## Cosa produce la pipeline
 
 Un piccolo "magazzino" in Parquet (formato colonnare aperto), in architettura
 **medallion** (bronze → silver → gold):
@@ -56,9 +59,9 @@ warehouse/
 
 I JSON grezzi sono il bronze; il silver è un modello a stella (`events` = fatti,
 `matches` e `players` = dimensioni); il gold sono le metriche pre-aggregate che
-leggono dashboard e Tableau senza riscandire gli eventi.
+leggono dashboard e Tableau senza riscandire gli eventi uno ad uno.
 
-## Qualità del dato
+## Verifica propedeutica della qualità del dato
 
 La validazione al confine (`src/validation.py`) **rifiuta** i record malformati
 (tipo evento o outcome non a schema, coordinate fuori campo, ruolo non valido):
@@ -67,13 +70,13 @@ tornano col punteggio) sono **segnalate** come avvisi, non bloccano il carico.
 `python3 run.py --verify` rilegge poi il magazzino e ri-asserisce le invarianti
 (event_id unici, niente null nelle chiavi, manifest allineato ai Parquet).
 
-## Come funziona l'incrementale (in breve)
+## Come funziona l'incrementale
 
 Di ogni file calcoliamo un hash SHA-256 del contenuto. Lo confrontiamo con il
 `_manifest.json` dell'ultimo run: se l'hash è identico la partita si salta, se è
 nuovo o diverso la sua (sola) partizione Parquet viene riscritta. Risultato:
 rieseguire sullo stesso lotto non fa nulla (idempotenza), e la partita corretta
-`1003` viene rielaborata da sola, senza toccare le altre 27.
+`1003` viene rielaborata da sola, senza toccare le altre.
 
 ## Struttura del codice
 
