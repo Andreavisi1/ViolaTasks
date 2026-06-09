@@ -37,3 +37,6 @@ st.download_button("⬇  Scarica il CSV dei dati", csv, "events_flat.csv", "text
 st.divider()
 
 st.iframe(DESIGN_URL, height=1000)
+
+st.divider()
+st.caption("© 2026 Andrea Visi · Viola Analytics")
