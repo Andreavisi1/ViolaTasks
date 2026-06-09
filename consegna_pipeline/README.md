@@ -7,15 +7,26 @@ Trasforma i JSON delle partite in dati puliti, tipizzati e interrogabili.
 
 Richiede **Python 3.9+** (su macOS lancia con `python3`, non `python`).
 
+Comando unico, multipiattaforma (installa le dipendenze e fa tutto in fila):
+
+```bash
+./run.sh        # macOS / Linux
+.\run.ps1       # Windows (PowerShell)
+```
+
+Oppure a mano, con i singoli passi:
+
 ```bash
 python3 -m pip install -r requirements.txt
 
-python3 run.py --initial   # elabora il lotto iniziale (data/raw)
-python3 run.py --update    # elabora il lotto di aggiornamento (data/raw_update)
-python3 run.py --query     # risponde alle domande di esempio + metrica xG
+python3 run.py --all       # initial -> update -> query -> verify, in sequenza
+python3 run.py --initial   # solo il lotto iniziale (data/raw)
+python3 run.py --update    # solo il lotto di aggiornamento (data/raw_update)
+python3 run.py --query     # solo le domande di esempio + metrica xG
+python3 run.py --verify    # rilegge il magazzino e ri-asserisce le invarianti
 
-streamlit run app.py      # mini-dashboard interattiva nel browser
-python3 charts/charts.py  # genera i grafici (PNG) in charts/output/
+streamlit run app.py       # dashboard interattiva nel browser
+python3 charts/charts.py   # genera i grafici (PNG) in charts/output/
 ```
 
 ## Dashboard (interfaccia)
@@ -31,17 +42,30 @@ Per puntare altrove: `CALCIO_DATA=/percorso/data python3 run.py --initial`.
 
 ## Cosa produce
 
-Un piccolo "magazzino" in Parquet (formato colonnare aperto), partizionato per partita:
+Un piccolo "magazzino" in Parquet (formato colonnare aperto), in architettura
+**medallion** (bronze → silver → gold):
 
 ```
 warehouse/
-  matches/match_id=1003/data.parquet   # anagrafica gara
-  players/match_id=1003/data.parquet   # distinta giocatori
-  events/match_id=1003/data.parquet    # ogni pass/shot/tackle/dribble/foul
+  matches/match_id=1003/data.parquet   # silver: anagrafica gara
+  players/match_id=1003/data.parquet   # silver: distinta giocatori
+  events/match_id=1003/data.parquet    # silver: ogni pass/shot/tackle/dribble/foul
+  gold/player_season_stats.parquet     # gold: metriche per giocatore-stagione, pronte all'uso
   _manifest.json                       # stato: {match_id: hash} per l'incrementale
 ```
 
-Tre tabelle in modello a stella: `events` sono i fatti, `matches` e `players` le dimensioni.
+I JSON grezzi sono il bronze; il silver è un modello a stella (`events` = fatti,
+`matches` e `players` = dimensioni); il gold sono le metriche pre-aggregate che
+leggono dashboard e Tableau senza riscandire gli eventi.
+
+## Qualità del dato
+
+La validazione al confine (`src/validation.py`) **rifiuta** i record malformati
+(tipo evento o outcome non a schema, coordinate fuori campo, ruolo non valido):
+i dati sporchi non entrano nel magazzino. Le incongruenze soft (es. gol che non
+tornano col punteggio) sono **segnalate** come avvisi, non bloccano il carico.
+`python3 run.py --verify` rilegge poi il magazzino e ri-asserisce le invarianti
+(event_id unici, niente null nelle chiavi, manifest allineato ai Parquet).
 
 ## Come funziona l'incrementale (in breve)
 
@@ -54,23 +78,32 @@ rieseguire sullo stesso lotto non fa nulla (idempotenza), e la partita corretta
 ## Struttura del codice
 
 ```
-run.py            punto d'ingresso (CLI)
-app.py            mini-dashboard Streamlit
-src/config.py     percorsi e schema
-src/extract.py    trova i JSON, li legge, calcola l'hash
-src/transform.py  JSON annidato → 3 tabelle piatte e tipizzate
-src/load.py       scrive Parquet (1 partizione per partita) + manifest
-src/pipeline.py   orchestrazione + logica incrementale
-src/queries.py    domande di esempio + metrica xG (SQL su DuckDB)
-tests/            verifica tipizzazione, incrementale e idempotenza
+run.py             punto d'ingresso (CLI: --initial/--update/--query/--verify/--all)
+run.sh / run.ps1   avvio unico cross-OS
+app.py             dashboard Streamlit (Viola Analytics)
+src/config.py      percorsi e schema
+src/extract.py     trova i JSON, li legge, calcola l'hash
+src/transform.py   JSON annidato → 3 tabelle piatte e tipizzate
+src/validation.py  validazione al confine + avvisi di qualità
+src/load.py        scrive Parquet (1 partizione per partita) + manifest
+src/pipeline.py    orchestrazione + logica incrementale
+src/gold.py        layer gold: metriche per giocatore-stagione
+src/queries.py     domande di esempio + metrica xG (SQL su DuckDB)
+src/verify.py      ri-asserisce le invarianti del magazzino
+charts/charts.py   grafici PNG (tema viola, per fase di gioco)
+tests/             pytest: tipizzazione, incrementale, validazione, gold, verify
+.github/workflows/ CI: ruff + pytest a ogni push
 ```
 
-## Test
+## Test e qualità
 
 ```bash
-python -m pytest -q
+python -m pytest -q     # incrementale, idempotenza, validazione, gold, verify
+ruff check src tests    # lint
 ```
 
-Verificano che il lotto iniziale carichi 24 partite, che l'update ne tocchi solo 5
-(4 nuove + la 1003 corretta), che rieseguire non rielabori nulla, e che la metrica
-xG produca numeri sensati.
+La CI (`.github/workflows/ci.yml`) esegue lint e test su Python 3.10 e 3.12 a
+ogni push. I test verificano che il lotto iniziale carichi 24 partite, che
+l'update ne tocchi solo 5 (4 nuove + la 1003 corretta), che rieseguire non
+rielabori nulla, che i record malformati vengano rifiutati e che `verify` non
+trovi problemi.

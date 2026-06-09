@@ -1,0 +1,25 @@
+[project]
+name = "viola-analytics-pipeline"
+version = "1.0.0"
+description = "Pipeline incrementale di event data calcistico: da JSON a Parquet interrogabile con DuckDB."
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]          # rende importabile `src` quando si lanciano i test
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+
+[tool.ruff.lint]
+# pyflakes (F), pycodestyle (E/W), import-order (I), bugbear (B), pyupgrade (UP)
+select = ["E", "F", "I", "B", "UP", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+# query SQL e grafici hanno righe lunghe per leggibilita'; i test usano assert liberi
+"src/queries.py" = ["E501"]
+"src/gold.py" = ["E501"]
+"charts/charts.py" = ["E501"]
+"app.py" = ["E501"]
+"tests/*" = ["E501"]

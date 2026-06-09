@@ -20,6 +20,11 @@ def connect() -> duckdb.DuckDBPyConnection:
             f"CREATE VIEW {t} AS "
             f"SELECT * FROM read_parquet('{glob}', hive_partitioning=1)"
         )
+    # Vista gold (se gia' costruita): metriche per giocatore-stagione pronte all'uso.
+    gold = config.WAREHOUSE / "gold" / "player_season_stats.parquet"
+    if gold.exists():
+        con.execute(f"CREATE VIEW player_season_stats AS "
+                    f"SELECT * FROM read_parquet('{gold.as_posix()}')")
     return con
 
 

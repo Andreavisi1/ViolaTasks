@@ -5,7 +5,7 @@ Tutto il resto viene saltato. Ri-eseguire sullo stesso lotto non fa nulla (idemp
 """
 from pathlib import Path
 
-from . import extract, transform, load
+from . import extract, load, transform, validation
 
 
 def run(source_dir: Path) -> dict:
@@ -13,7 +13,7 @@ def run(source_dir: Path) -> dict:
     manifest = load.load_manifest()
     files = extract.discover_matches(source_dir)
 
-    processed, skipped = [], []
+    processed, skipped, warnings, errors = [], [], [], []
     for path in files:
         h = extract.content_hash(path)
         # match_id dal nome file (es. 1003.json -> "1003"), robusto e veloce
@@ -24,9 +24,15 @@ def run(source_dir: Path) -> dict:
             continue
 
         match = extract.load_match(path)
+        try:
+            warnings += validation.validate_match(match)   # avvisi soft (non bloccano)
+        except validation.ValidationError as ex:
+            errors.append(f"{match_id}: {ex}")             # quarantena: non entra
+            continue
+
         tables = transform.transform(match)
         load.write_match(tables, int(match_id))
-        manifest[match_id] = h              # aggiorno lo stato
+        manifest[match_id] = h              # aggiorno lo stato solo se caricata
         processed.append(match_id)
 
     load.save_manifest(manifest)
@@ -34,5 +40,7 @@ def run(source_dir: Path) -> dict:
         "source": str(source_dir),
         "processed": processed,
         "skipped": skipped,
+        "warnings": warnings,
+        "errors": errors,
         "total_in_manifest": len(manifest),
     }

@@ -9,7 +9,6 @@ viene corretta, riscriviamo solo la sua cartella, non tutto il dataset.
 """
 import json
 import shutil
-from pathlib import Path
 
 import pandas as pd
 
