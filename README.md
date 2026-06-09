@@ -7,7 +7,8 @@ puliti, tipizzati e interrogabili, con una dashboard che un analista apre e usa.
 
 ```bash
 cd consegna_pipeline
-./run.sh        # macOS / Linux   (Windows: .\run.ps1)
+./run.sh        # macOS / Linux
+.\run.ps1       # Windows
 ```
 
 Un comando solo: installa le dipendenze ed esegue tutto in fila: carico iniziale,
