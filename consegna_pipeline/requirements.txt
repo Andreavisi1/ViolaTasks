@@ -1,6 +1,10 @@
+# --- Runtime ---
 pandas>=2.0
-pyarrow>=14.0
+pyarrow>=14.0        # backend Parquet per pandas
 duckdb>=0.10
+streamlit>=1.40      # dashboard
+matplotlib>=3.7      # grafici (charts/charts.py)
+
+# --- Dev / qualita' ---
 pytest>=8.0
-streamlit>=1.40
-matplotlib>=3.7
+ruff>=0.6

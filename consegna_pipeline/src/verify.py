@@ -11,34 +11,47 @@ Distingue problemi DURI (rompono le promesse della pipeline) da avvisi SOFT
 from . import load
 
 
-def run(con) -> tuple[list[str], list[str]]:
-    """Ritorna (problemi_duri, avvisi_soft)."""
-    hard, soft = [], []
+def run(con) -> tuple[list[tuple[str, bool, str]], list[str]]:
+    """Esegue i controlli di integrità rileggendo i Parquet.
 
-    # 1) event_id unici dentro ogni partita (DURO)
+    Ritorna:
+      - checks: lista di (descrizione, superato, dettaglio) per ogni invariante;
+      - warnings: avvisi di qualità del dato (non bloccanti).
+    """
+    checks, warnings = [], []
+
+    # Invariante 1 — chiave naturale: event_id univoco entro la partita.
     dup = con.sql("""
         SELECT match_id FROM events
         GROUP BY match_id HAVING count(*) <> count(DISTINCT event_id)
     """).fetchall()
-    if dup:
-        hard.append(f"event_id duplicati in {len(dup)} partite: {[d[0] for d in dup][:5]}")
+    checks.append((
+        "event_id univoco all'interno di ogni partita",
+        not dup,
+        f"{len(dup)} partite con id duplicati" if dup else "",
+    ))
 
-    # 2) niente null nelle colonne chiave (DURO)
+    # Invariante 2 — completezza: nessun null nelle colonne chiave.
     nulls = con.sql("""
         SELECT count(*) FROM events
         WHERE match_id IS NULL OR player_id IS NULL OR type IS NULL OR minute IS NULL
     """).fetchone()[0]
-    if nulls:
-        hard.append(f"{nulls} eventi con campi chiave nulli")
+    checks.append((
+        "nessun valore nullo nelle colonne chiave (match_id, player_id, type, minute)",
+        nulls == 0,
+        f"{nulls} eventi incompleti" if nulls else "",
+    ))
 
-    # 3) manifest allineato alle partizioni Parquet presenti (DURO)
+    # Invariante 3 — coerenza stato/dati: il manifest combacia con le partizioni su disco.
     man_ids = {int(k) for k in load.load_manifest()}
     pq_ids = {r[0] for r in con.sql("SELECT DISTINCT match_id FROM matches").fetchall()}
-    if man_ids != pq_ids:
-        hard.append(f"manifest e Parquet non combaciano: solo manifest {man_ids - pq_ids}, "
-                    f"solo Parquet {pq_ids - man_ids}")
+    checks.append((
+        "il manifest dell'incrementale combacia con le partizioni Parquet scritte",
+        man_ids == pq_ids,
+        f"disallineate: {sorted(man_ids ^ pq_ids)}" if man_ids != pq_ids else "",
+    ))
 
-    # 4) gol negli eventi vs punteggio finale (SOFT: qualita' del dato sorgente)
+    # Qualità del dato (sorgente) — non blocca: gol negli eventi vs punteggio finale.
     mism = con.sql("""
         SELECT m.match_id, m.score_home + m.score_away AS score,
                count(*) FILTER (WHERE e.type='shot' AND e.outcome='goal') AS goals
@@ -46,6 +59,6 @@ def run(con) -> tuple[list[str], list[str]]:
         GROUP BY m.match_id, score HAVING score <> goals
     """).fetchall()
     for match_id, score, goals in mism:
-        soft.append(f"match {match_id}: {goals} gol negli eventi vs {score} nel punteggio")
+        warnings.append(f"partita {match_id}: {goals} gol negli eventi, {score} nel punteggio finale")
 
-    return hard, soft
+    return checks, warnings

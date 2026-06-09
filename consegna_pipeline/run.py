@@ -9,12 +9,44 @@ Esempi:
 import argparse
 import sys
 
-from src import config, pipeline, queries, gold, verify
+from src import config, gold, pipeline, queries, verify
 
 
 def _banner() -> None:
-    """Piccolo giglio viola all'avvio (codici colore ANSI: \\033[...m)."""
-    print("\033[38;5;91m  ⚜  match pipeline · forza viola\033[0m")
+    """Mega logo viola all'avvio: crest Fiorentina in ASCII + titolo (ANSI)."""
+    viola = "\033[1;38;5;93m"   # viola brillante, grassetto
+    reset = "\033[0m"
+    lines = [
+        "",
+        "                  ::",
+        "                :++++:",
+        "              :++: .:++:",
+        "            :++: :=+-.:++:",
+        "          :++:   =+++.  :++:",
+        "        :++: :==:.++-.-=-.:++:",
+        "      :++:   =+---=+--:=+:  :++:",
+        "    :=+:      .  .=+-  .      :+=:",
+        "   -*=  ::::::.  .++-  .::::::  =*-",
+        "    :=+:.=*****+: .: :+*****=.:+=:",
+        "      :++:.-*****+::+*****-.:++:",
+        "        :++:.-**********-.:++:",
+        "          :++:.-+****+-.:++:",
+        "            :++:.-++-.:++:",
+        "              :++:  :++:",
+        "                :++++:",
+        "                  ::",
+        "",
+        "   █   █  █████  █████  █      █████",
+        "   █   █    █    █   █  █      █   █",
+        "   █   █    █    █   █  █      █████",
+        "    █ █     █    █   █  █      █   █",
+        "     █    █████  █████  █████  █   █",
+        "",
+        "         A  N  A  L  Y  T  I  C  S",
+        "   match-event pipeline · ACF Fiorentina · 1926",
+        "",
+    ]
+    print(viola + "\n".join(lines) + reset)
 
 
 def _print_summary(res: dict) -> None:
@@ -35,6 +67,7 @@ def _print_summary(res: dict) -> None:
 def _build_gold() -> None:
     """Ricostruisce il layer gold dal silver (se il magazzino esiste)."""
     if (config.WAREHOUSE / "matches").exists():
+        print("  costruisco il layer gold (metriche per giocatore-stagione)...")
         con = queries.connect()
         gold.build(con)
         con.close()
@@ -50,18 +83,32 @@ def _run_queries() -> None:
 
 
 def _verify() -> bool:
-    """Stampa il report di verifica. Ritorna True se ci sono problemi DURI."""
+    """Verifica di integrità: rilegge i Parquet e ricontrolla le invarianti.
+
+    Ritorna True se almeno un'invariante è violata (per uscire con errore in CI).
+    """
     con = queries.connect()
-    hard, soft = verify.run(con)
-    print("\n# Verifica magazzino")
-    print("  problemi duri:", "NESSUNO" if not hard else "")
-    for h in hard:
-        print(f"    ✗ {h}")
-    print(f"  avvisi soft (qualita' dato): {len(soft)}")
-    for s in soft[:5]:
-        print(f"    ! {s}")
-    print("  esito:", "OK ✓" if not hard else "FALLITO ✗")
-    return bool(hard)
+    checks, warnings = verify.run(con)
+    ok = sum(1 for _, superato, _ in checks if superato)
+
+    print("\n--- Verifica di integrità del magazzino ---")
+    print("Rilettura dei Parquet dal disco e controllo delle invarianti garantite dalla pipeline:")
+    for descrizione, superato, dettaglio in checks:
+        segno = "✓" if superato else "✗"
+        riga = f"  {segno}  {descrizione}"
+        if dettaglio:
+            riga += f"   → {dettaglio}"
+        print(riga)
+
+    print(f"  Qualità del dato sorgente: {len(warnings)} avvisi non bloccanti"
+          + (" (es. gol che non tornano col punteggio finale):" if warnings else "."))
+    for w in warnings[:5]:
+        print(f"      · {w}")
+
+    violate = [c for c in checks if not c[1]]
+    print(f"  Esito: {'integrità confermata' if not violate else 'VERIFICA FALLITA'} "
+          f"({ok}/{len(checks)} invarianti rispettate).")
+    return bool(violate)
 
 
 def main() -> None:
@@ -86,12 +133,15 @@ def main() -> None:
 
     _banner()
     if do_initial:
+        print("\n=> Lotto iniziale (data/raw)")
         _print_summary(pipeline.run(config.RAW_INITIAL))
         _build_gold()
     if do_update:
+        print("\n=> Lotto di aggiornamento (data/raw_update) — incrementale")
         _print_summary(pipeline.run(config.RAW_UPDATE))
         _build_gold()
     if do_query:
+        print("\n=> Domande di esempio sui dati")
         _run_queries()
     if do_verify and _verify():
         sys.exit(1)     # esce con errore: utile in CI

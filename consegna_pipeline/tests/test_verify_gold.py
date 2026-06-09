@@ -15,6 +15,6 @@ def test_gold_e_verify():
     cols = {c for c in con2.sql("SELECT * FROM player_season_stats LIMIT 0").df().columns}
     assert {"player_name", "season", "minutes", "xg", "goals_minus_xg"} <= cols
 
-    # verify: nessun problema DURO sulle invarianti
-    hard, _soft = verify.run(con2)
-    assert hard == []
+    # verify: tutte le invarianti devono risultare superate
+    checks, _warnings = verify.run(con2)
+    assert all(superato for _descr, superato, _det in checks)

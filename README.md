@@ -6,8 +6,10 @@ puliti, tipizzati e interrogabili, con una dashboard che un analista apre e usa.
 ## Avvio rapido
 
 ```bash
-cd consegna_pipeline
-./run.sh        # macOS / Linux
+git clone https://github.com/Andreavisi1/ViolaTasks.git
+cd ViolaTasks/consegna_pipeline
+
+./run.sh        # macOS / Linux   (esegue la pipeline e apre la dashboard)
 .\run.ps1       # Windows
 ```
 
@@ -59,3 +61,7 @@ Viola Analytics — Fiorentina Design System/   sorgente del design system della
 
 Dettagli ed esecuzione completa: [`consegna_pipeline/README.md`](consegna_pipeline/README.md).
 La parte teorica (metriche + data warehouse) è inclusa nella consegna.
+
+---
+
+© 2026 Andrea Visi · Viola Analytics
