@@ -1,0 +1,17 @@
+# macOS / editor
+.DS_Store
+**/.DS_Store
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.ruff_cache/
+**/.venv/
+
+# artefatti generati
+**/warehouse/
+consegna_pipeline/charts/output/
+
+# dati ridondanti (i JSON sono già estratti in candidate_dataset/)
+candidate_dataset.zip

@@ -2,5 +2,7 @@ warehouse/
 __pycache__/
 *.pyc
 .pytest_cache/
+.ruff_cache/
 charts/output/
 .venv/
+.DS_Store
