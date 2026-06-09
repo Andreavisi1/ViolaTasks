@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Spacing scale" subtitle="4px base grid — 0 → 64px." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-card); padding: 24px; color: var(--text-primary); }
+  .r { display:flex; align-items:center; gap:14px; margin-bottom:9px; }
+  .name { width:80px; font: var(--fw-medium) 11px var(--font-mono); color: var(--text-muted); }
+  .bar { height:16px; background: var(--viola-400); border-radius: 3px; }
+  .px { font: 11px var(--font-mono); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <div id="rows"></div>
+  <script>
+    const root = getComputedStyle(document.documentElement);
+    const steps = [1,2,3,4,5,6,8,10,12,16];
+    document.getElementById('rows').innerHTML = steps.map(s => {
+      const v = root.getPropertyValue('--space-'+s).trim();
+      const px = parseFloat(v)*16;
+      return `<div class="r"><div class="name">--space-${s}</div><div class="bar" style="width:${px}px"></div><div class="px">${px}px</div></div>`;
+    }).join('');
+  </script>
+</body>
+</html>

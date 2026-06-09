@@ -1,0 +1,27 @@
+<!-- @dsCard group="Type" viewport="700x200" name="Data — IBM Plex Mono" subtitle="Tabular figures for tables, coordinates, CSV chrome, engineer details." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-mono); background: var(--gray-950); padding: 22px; color: var(--gray-100); }
+  table { border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th { text-align: right; color: var(--accent-300); font-weight: 600; padding: 4px 14px; border-bottom: 1px solid var(--gray-700); }
+  th:first-child, td:first-child { text-align: left; }
+  td { padding: 4px 14px; color: var(--gray-200); }
+  td.n { color: #fff; }
+  .c { color: var(--positive-500); }
+  .tag { color: var(--gray-500); }
+</style>
+</head>
+<body>
+  <table>
+    <tr><th>player_name</th><th>mins</th><th>goals</th><th>xg</th><th>g_minus_xg</th><th>pass%</th></tr>
+    <tr><td>R. Sottil</td><td class="n">2,070</td><td class="n">9</td><td class="n">6.41</td><td class="n c">+2.59</td><td class="n">81.4%</td></tr>
+    <tr><td>N. González</td><td class="n">1,845</td><td class="n">7</td><td class="n">7.88</td><td class="n">-0.88</td><td class="n">76.2%</td></tr>
+    <tr><td>G. Bonaventura</td><td class="n">1,710</td><td class="n">6</td><td class="n">4.02</td><td class="n c">+1.98</td><td class="n">84.9%</td></tr>
+  </table>
+  <div class="tag" style="margin-top:12px;font-size:11px;">// 0–100 pitch coords · xg ∈ [0,1] · tnum on, slashed zero</div>
+</body>
+</html>

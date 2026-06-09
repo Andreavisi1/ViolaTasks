@@ -1,0 +1,24 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Elevation" subtitle="Soft violet-tinted shadows. Cards sit on xs–sm; popovers on lg." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-page); padding: 28px 24px; }
+  .row { display:flex; gap:26px; }
+  .item { text-align:center; }
+  .box { width:96px; height:64px; background: var(--surface-card); border-radius: var(--radius-md); display:flex; align-items:center; justify-content:center; font: var(--fw-semibold) 11px var(--font-mono); color: var(--text-secondary); }
+  .name { font: var(--fw-medium) 11px var(--font-mono); color: var(--text-muted); margin-top:12px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-xs)">xs</div><div class="name">--shadow-xs</div></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-sm)">sm</div><div class="name">--shadow-sm</div></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-md)">md</div><div class="name">--shadow-md</div></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-lg)">lg</div><div class="name">--shadow-lg</div></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-brand);background:var(--viola-700);color:#fff">brand</div><div class="name">--shadow-brand</div></div>
+  </div>
+</body>
+</html>

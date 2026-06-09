@@ -1,0 +1,27 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Neutrals" subtitle="Cool gray with a faint violet tint — surfaces, text, borders." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-card); padding: 20px; }
+  .row { display:flex; gap:0; border-radius: var(--radius-md); overflow:hidden; box-shadow: var(--shadow-sm); border:1px solid var(--border-subtle); }
+  .sw { flex:1; height:84px; display:flex; flex-direction:column; justify-content:flex-end; padding:6px 8px; }
+  .sw span { font: var(--fw-semibold) 10px var(--font-mono); }
+  .sw small { font: 9px var(--font-mono); opacity:.8; }
+</style>
+</head>
+<body>
+  <div class="row" id="row"></div>
+  <script>
+    const steps = [50,100,200,300,400,500,600,700,800,900,950];
+    const root = getComputedStyle(document.documentElement);
+    document.getElementById('row').innerHTML = steps.map(s => {
+      const v = root.getPropertyValue('--gray-'+s).trim();
+      const dark = s >= 400;
+      return `<div class="sw" style="background:${v};color:${dark?'#fff':'#1A1626'}"><span>${s}</span><small>${v}</small></div>`;
+    }).join('');
+  </script>
+</body>
+</html>

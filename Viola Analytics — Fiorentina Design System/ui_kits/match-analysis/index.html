@@ -1,0 +1,123 @@
+<!-- @dsCard group="Match Analysis" viewport="1320x920" name="Match Analysis Dashboard" subtitle="CSV → classifica + scheda giocatore + mappa azioni. Live recompute." -->
+<!-- @startingPoint section="Match Analysis" subtitle="Full match-analysis dashboard (CSV ingest → charts → pitch map)" viewport="1320x920" -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Viola Analytics — Match Analysis</title>
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: var(--font-body); background: var(--surface-page); color: var(--text-primary);
+    -webkit-font-smoothing: antialiased; }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  #root { max-width: var(--container-max); margin: 0 auto; padding: 22px 28px 40px; }
+
+  /* ---------- Header ---------- */
+  .va-header { display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 6px 2px 18px; }
+  .va-brand { display: flex; align-items: center; gap: 16px; }
+  .va-crest-wrap { position: relative; cursor: pointer; user-select: none; }
+  .va-crest { width: 54px; height: 54px; display: block; transition: transform var(--dur-base) var(--ease-spring); }
+  .va-crest-wrap:active .va-crest { transform: scale(0.92); }
+  .va-ball { position: absolute; top: -8px; right: -10px; font-size: 20px; opacity: 0; pointer-events: none; }
+  .va-ball.go { animation: va-roll 900ms var(--ease-out); }
+  @keyframes va-roll { 0% { opacity: 1; transform: rotate(0) translateY(0); } 100% { opacity: 0; transform: rotate(900deg) translateY(-6px); } }
+  .va-1926 { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%) translateY(3px);
+    font: var(--fw-bold) 8px var(--font-mono); letter-spacing: .12em; color: var(--giglio-500);
+    opacity: 0; transition: all var(--dur-base) var(--ease-out); white-space: nowrap; }
+  .va-crest-wrap:hover .va-1926 { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .va-word-v { font: var(--fw-bold) 24px/1 var(--font-display); letter-spacing: var(--ls-tight); color: var(--viola-800); }
+  .va-word-v span { color: var(--accent-600); }
+  .va-word-a { font: var(--fw-medium) 11px var(--font-mono); letter-spacing: .04em; color: var(--text-muted); margin-top: 5px; }
+  .va-pill-file { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-xs); font-size: var(--text-xs); color: var(--text-secondary); }
+  .va-pill-file .mono { color: var(--text-primary); }
+  .va-sep { color: var(--border-strong); }
+  .va-dot-live { width: 8px; height: 8px; border-radius: 50%; background: var(--positive-500);
+    box-shadow: 0 0 0 3px var(--positive-100); animation: va-pulse 2s var(--ease-in-out) infinite; }
+  @keyframes va-pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  /* ---------- Upload ---------- */
+  .va-upload { margin-bottom: 18px; }
+
+  /* ---------- Empty state ---------- */
+  .va-empty { text-align: center; padding: 56px 20px 64px; max-width: 560px; margin: 0 auto; }
+  .va-empty-icon { font-size: 42px; margin-bottom: 8px; }
+  .va-empty h2 { font: var(--type-h1); color: var(--text-primary); margin: 0 0 12px; }
+  .va-empty p { font-size: var(--text-base); line-height: var(--lh-normal); color: var(--text-secondary); margin: 0 auto 22px; }
+  .va-empty-cols { margin-top: 26px; font-size: 11px; color: var(--text-muted); line-height: 1.8;
+    background: var(--surface-sunken); border-radius: var(--radius-md); padding: 12px 16px; }
+
+  /* ---------- Filters ---------- */
+  .va-filters { background: var(--surface-card); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 18px 20px; margin-bottom: 22px; }
+  .va-filters-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 22px; align-items: end; }
+  .va-filters-foot { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+
+  /* ---------- Grid ---------- */
+  .va-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .va-noresult { background: var(--warning-100); border: 1px solid #F2DBA6; color: #7a5300;
+    border-radius: var(--radius-lg); padding: 18px 20px; font-size: var(--text-sm); }
+
+  /* ---------- Ranking ---------- */
+  .va-help-inline { font: var(--fw-semibold) var(--text-sm) var(--font-body); color: var(--text-secondary);
+    display: inline-flex; align-items: center; gap: 5px; }
+  .va-rank-controls { display: flex; align-items: center; gap: 14px; margin: 16px 0 6px; }
+  .va-rank-controls > div { flex: 1; }
+  .va-per90-tag { font-size: 10px; color: var(--accent-600); background: var(--accent-soft);
+    padding: 3px 8px; border-radius: var(--radius-pill); font-weight: 600; }
+  .va-chart { position: relative; margin: 6px 0 4px; }
+  .va-rank-table { margin-top: 8px; border-top: 1px solid var(--border-subtle); }
+  .va-cap { font-size: var(--text-xs); color: var(--text-muted); line-height: var(--lh-normal); margin: 12px 0 0; }
+
+  /* ---------- Player card ---------- */
+  .va-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .va-pitch-block { }
+  .va-pitch-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .va-pitch-head h4 { margin: 0; font: var(--type-card-title); color: var(--text-primary); }
+  .va-pitch-foot { margin-top: 12px; }
+  .va-pitch-foot .va-cap b { color: var(--text-secondary); }
+
+  /* ---------- Footer ---------- */
+  .va-foot { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--border-subtle);
+    font-size: 11px; color: var(--text-muted); text-align: center; }
+  .va-foot-egg { color: var(--giglio-500); cursor: help; }
+
+  @media (max-width: 1000px) {
+    .va-grid { grid-template-columns: 1fr; }
+    .va-filters-grid { grid-template-columns: repeat(2, 1fr); }
+    .va-kpis { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    #root { padding: 16px 14px 32px; }
+    .va-filters-grid, .va-kpis { grid-template-columns: 1fr; }
+    .va-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + Babel (pinned) -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <!-- Data libs (cdnjs) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <!-- Design system bundle -->
+  <script src="../../_ds_bundle.js"></script>
+
+  <!-- App: plain data scripts, then babel UI -->
+  <script src="data.js"></script>
+  <script src="sample.js"></script>
+  <script type="text/babel" src="sections.jsx"></script>
+  <script type="text/babel" src="App.jsx"></script>
+</body>
+</html>

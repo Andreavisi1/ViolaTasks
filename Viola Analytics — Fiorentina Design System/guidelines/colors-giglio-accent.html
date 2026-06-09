@@ -1,0 +1,41 @@
+<!-- @dsCard group="Colors" viewport="700x200" name="Giglio red & data accent" subtitle="Florentine-lily red for goals/danger; luminous violet for key numbers." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-card); padding: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .group small.t { font: var(--fw-semibold) var(--text-xs) var(--font-body); color: var(--text-secondary); display:block; margin-bottom:8px; }
+  .ramp { display: flex; gap: 0; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .sw { flex:1; height:72px; display:flex; flex-direction:column; justify-content:flex-end; padding:6px 8px; }
+  .sw span { font: var(--fw-semibold) 10px var(--font-mono); }
+  .sw small { font: 9px var(--font-mono); opacity:.85; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="group">
+      <small class="t">Giglio red — goals, shots, danger</small>
+      <div class="ramp" id="giglio"></div>
+    </div>
+    <div class="group">
+      <small class="t">Data accent — highlights, key stats</small>
+      <div class="ramp" id="accent"></div>
+    </div>
+  </div>
+  <script>
+    const root = getComputedStyle(document.documentElement);
+    const build = (id, prefix, steps) => {
+      document.getElementById(id).innerHTML = steps.map(s => {
+        const v = root.getPropertyValue(`--${prefix}-${s}`).trim();
+        const dark = s >= 400;
+        return `<div class="sw" style="background:${v};color:${dark?'#fff':'#240E3D'}"><span>${s}</span><small>${v}</small></div>`;
+      }).join('');
+    };
+    build('giglio','giglio',[100,300,500,600,700]);
+    build('accent','accent',[300,400,500,600]);
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+warehouse/
+__pycache__/
+*.pyc
+.pytest_cache/
+charts/output/
+.venv/

@@ -1,0 +1,33 @@
+/* ============================================================
+   Viola Analytics — Elevation, shadows, motion
+   Soft, low, neutral-violet shadows. No harsh black.
+   ============================================================ */
+:root {
+  /* ---- Shadows -------------------------------------------- */
+  --shadow-xs:  0 1px 2px rgba(36, 14, 61, 0.06);
+  --shadow-sm:  0 1px 3px rgba(36, 14, 61, 0.08), 0 1px 2px rgba(36, 14, 61, 0.05);
+  --shadow-md:  0 4px 12px rgba(36, 14, 61, 0.08), 0 2px 4px rgba(36, 14, 61, 0.05);
+  --shadow-lg:  0 12px 28px rgba(36, 14, 61, 0.12), 0 4px 8px rgba(36, 14, 61, 0.06);
+  --shadow-xl:  0 24px 48px rgba(36, 14, 61, 0.16);
+  --shadow-brand: 0 8px 24px rgba(74, 32, 120, 0.28);
+  --shadow-inset: inset 0 1px 2px rgba(36, 14, 61, 0.08);
+
+  /* ---- Focus ring ----------------------------------------- */
+  --focus-ring: 0 0 0 3px var(--ring-focus);
+
+  /* ---- Motion --------------------------------------------- */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* @kind other */
+  --dur-fast:    120ms; /* @kind other */
+  --dur-base:    200ms; /* @kind other */
+  --dur-slow:    320ms; /* @kind other */
+
+  /* ---- Z-index -------------------------------------------- */
+  --z-base:    1;    /* @kind other */
+  --z-sticky:  100;  /* @kind other */
+  --z-overlay: 1000; /* @kind other */
+  --z-modal:   1100; /* @kind other */
+  --z-toast:   1200; /* @kind other */
+  --z-tooltip: 1300; /* @kind other */
+}

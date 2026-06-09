@@ -1,0 +1,110 @@
+/* ============================================================
+   Viola Analytics — Color tokens
+   Brand: ACF Fiorentina (viola + giglio red), match-analysis context.
+   Base palette + semantic aliases. Light-first, viola-forward.
+   ============================================================ */
+:root {
+  /* ---- Brand: Viola (the purple) ---------------------------- */
+  --viola-50:  #F8F4FC;
+  --viola-100: #F0E6F8;
+  --viola-200: #DFC9EE;
+  --viola-300: #C39BDF;
+  --viola-400: #A066C9;
+  --viola-500: #7E3FA0;   /* crest fill */
+  --viola-600: #5C2D91;   /* official Fiorentina viola */
+  --viola-700: #4A2078;   /* primary brand */
+  --viola-800: #361659;
+  --viola-900: #240E3D;
+  --viola-950: #170828;   /* deepest, near-black violet */
+
+  /* ---- Brand: Giglio (Florentine lily red) ----------------- */
+  --giglio-100: #FCE3E2;
+  --giglio-300: #F4908B;
+  --giglio-500: #E8332C;  /* the fleur-de-lis red */
+  --giglio-600: #CC241F;
+  --giglio-700: #A31A17;
+
+  /* ---- Accent: luminous data violet (key numbers) ---------- */
+  --accent-300: #D8A9FF;
+  --accent-400: #B96BFF;
+  --accent-500: #A24BE0;  /* highlight / key stat pop */
+  --accent-600: #8B2FCC;
+
+  /* ---- Pitch greens (the field) ---------------------------- */
+  --pitch-50:  #EAF4EE;
+  --pitch-300: #6FBF8E;
+  --pitch-500: #2E8B57;
+  --pitch-600: #1F6B3F;
+  --pitch-700: #14532D;
+  --pitch-900: #0C2E1A;
+  --pitch-grass-a: #2C7A48;  /* mowing stripe A */
+  --pitch-grass-b: #31864F;  /* mowing stripe B */
+  --pitch-line:    rgba(255, 255, 255, 0.78);
+
+  /* ---- Neutrals (cool gray, faint violet tint) ------------- */
+  --gray-50:  #F8F7FB;
+  --gray-100: #F1EFF6;
+  --gray-200: #E4E0EC;
+  --gray-300: #C9C3D6;
+  --gray-400: #9F98B0;
+  --gray-500: #756C8C;
+  --gray-600: #564E6B;
+  --gray-700: #3D3650;
+  --gray-800: #2A2438;
+  --gray-900: #1A1626;
+  --gray-950: #110E1A;
+  --white: #FFFFFF;
+  --black: #000000;
+
+  /* ---- Event-type categorical palette (pitch map / legends) - */
+  --ev-pass:    #3B82F6;  /* blue   */
+  --ev-shot:    #E8332C;  /* giglio red */
+  --ev-tackle:  #F59E0B;  /* amber  */
+  --ev-dribble: #14B8A6;  /* teal   */
+  --ev-foul:    #94A3B8;  /* slate  */
+
+  /* ---- Status / feedback ----------------------------------- */
+  --positive-500: #15A862;  /* over-performing / won */
+  --positive-100: #DCF3E8;
+  --warning-500:  #E59500;
+  --warning-100:  #FBEED2;
+  --danger-500:   #DD2E25;
+  --danger-100:   #FBE0DE;
+  --info-500:     var(--viola-600);
+  --info-100:     var(--viola-100);
+
+  /* ============================================================
+     SEMANTIC ALIASES — author against these
+     ============================================================ */
+  --brand:            var(--viola-700);
+  --brand-strong:     var(--viola-800);
+  --brand-soft:       var(--viola-100);
+  --brand-contrast:   var(--white);
+  --accent:           var(--accent-500);   /* key numbers / highlights */
+  --accent-soft:      #F3E6FB;
+
+  /* surfaces */
+  --surface-page:    #F6F4FA;   /* app background */
+  --surface-card:    var(--white);
+  --surface-raised:  var(--white);
+  --surface-sunken:  var(--gray-100);
+  --surface-inverse: var(--viola-900);
+  --surface-brand:   var(--viola-700);
+  --surface-overlay: rgba(23, 8, 40, 0.55);
+
+  /* text */
+  --text-primary:   var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-muted:     var(--gray-400);
+  --text-inverse:   var(--white);
+  --text-brand:     var(--viola-700);
+  --text-accent:    var(--accent-600);
+  --text-link:      var(--viola-600);
+
+  /* borders */
+  --border-subtle:  var(--gray-200);
+  --border-default: var(--gray-300);
+  --border-strong:  var(--gray-400);
+  --border-brand:   var(--viola-300);
+  --ring-focus:     rgba(124, 63, 160, 0.35);  /* viola focus ring */
+}

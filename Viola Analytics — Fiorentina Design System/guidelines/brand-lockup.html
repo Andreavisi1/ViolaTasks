@@ -1,0 +1,35 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="Logo lockup" subtitle="Crest + wordmark. Mono 'ANALYTICS' label sits under the viola wordmark." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); padding: 0; }
+  .panel { padding: 28px; display:flex; gap:22px; }
+  .light { background: var(--surface-card); }
+  .dark { background: var(--viola-900); }
+  .lockup { display:flex; align-items:center; gap:14px; }
+  .lockup img { width: 56px; height: 56px; }
+  .word { line-height: 1; }
+  .word .v { font: var(--fw-bold) 26px/1 var(--font-display); letter-spacing: var(--ls-tight); }
+  .word .a { font: var(--fw-medium) 11px/1 var(--font-mono); letter-spacing: var(--ls-caps); text-transform: uppercase; margin-top: 6px; }
+  .light .v { color: var(--viola-700); } .light .a { color: var(--text-muted); }
+  .dark .v { color: #fff; } .dark .a { color: var(--accent-300); }
+</style>
+</head>
+<body style="display:grid;grid-template-columns:1fr 1fr;">
+  <div class="panel light">
+    <div class="lockup">
+      <img src="../assets/fiorentina-crest.png" alt="crest" />
+      <div class="word"><div class="v">Viola</div><div class="a">Match&nbsp;Analytics</div></div>
+    </div>
+  </div>
+  <div class="panel dark">
+    <div class="lockup">
+      <img src="../assets/fiorentina-crest.png" alt="crest" />
+      <div class="word"><div class="v">Viola</div><div class="a">Match&nbsp;Analytics</div></div>
+    </div>
+  </div>
+</body>
+</html>

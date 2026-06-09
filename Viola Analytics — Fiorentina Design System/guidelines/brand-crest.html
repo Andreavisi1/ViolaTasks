@@ -1,0 +1,38 @@
+<!-- @dsCard group="Brand" viewport="700x260" name="Crest & easter eggs" subtitle="Click the crest → ⚽ spins. Hover → founded 1926. Use with clear space." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-page); padding: 24px; color: var(--text-primary); display:flex; gap:28px; align-items:center; }
+  .crest-wrap { position: relative; }
+  .crest { width: 132px; height: 132px; cursor: pointer; display:block; transition: transform var(--dur-base) var(--ease-spring); }
+  .crest:active { transform: scale(0.95); }
+  .ball { position:absolute; right:-6px; top:-6px; font-size:26px; opacity:0; transition: opacity var(--dur-base) var(--ease-out); pointer-events:none; }
+  .ball.go { opacity:1; animation: roll 900ms var(--ease-out); }
+  @keyframes roll { from { transform: rotate(0) translateX(0); } to { transform: rotate(720deg) translateX(0); } }
+  .tip { position:absolute; left:50%; bottom:-34px; transform: translateX(-50%) translateY(4px); background: var(--viola-900); color:#fff; font: var(--fw-medium) var(--text-xs) var(--font-body); padding:5px 10px; border-radius: var(--radius-sm); white-space:nowrap; opacity:0; pointer-events:none; transition: all var(--dur-base) var(--ease-out); box-shadow: var(--shadow-md); }
+  .crest-wrap:hover .tip { opacity:1; transform: translateX(-50%) translateY(0); }
+  .info h3 { font: var(--type-h2); margin:0 0 6px; }
+  .info p { font-size: var(--text-sm); color: var(--text-secondary); margin:0 0 4px; max-width: 320px; line-height: var(--lh-normal); }
+  .info code { font: 11px var(--font-mono); color: var(--accent-600); }
+</style>
+</head>
+<body>
+  <div class="crest-wrap">
+    <img class="crest" id="crest" src="../assets/fiorentina-crest.png" alt="ACF Fiorentina crest" />
+    <span class="ball" id="ball">⚽</span>
+    <span class="tip">Fondata nel 1926 · Forza Viola</span>
+  </div>
+  <div class="info">
+    <h3>Il Giglio</h3>
+    <p>The viola diamond with the red Florentine lily. Keep clear space ≥ 25% of crest width. Never recolor the lily or stretch the lozenge.</p>
+    <p><code>assets/fiorentina-crest.png</code> · transparent PNG</p>
+  </div>
+  <script>
+    const crest = document.getElementById('crest'), ball = document.getElementById('ball');
+    crest.addEventListener('click', () => { ball.classList.remove('go'); void ball.offsetWidth; ball.classList.add('go'); });
+  </script>
+</body>
+</html>

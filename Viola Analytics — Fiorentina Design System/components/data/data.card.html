@@ -1,0 +1,93 @@
+<!-- @dsCard group="Components" viewport="700x900" name="Data — KpiCard, PitchMap, StatTable, Dropzone" subtitle="The match-analysis building blocks." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-page); padding: 22px; color: var(--text-primary); }
+  .lbl { font: var(--fw-bold) var(--text-2xs) var(--font-body); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--text-muted); margin: 0 0 10px; }
+  .block { margin-bottom: 24px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .panel { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 16px; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../../_ds_bundle.js"></script>
+  <script type="text/babel">
+    const NS = window.ViolaAnalyticsFiorentinaDesignSystem_48fef3;
+    const { KpiCard, PitchMap, StatTable, Dropzone, Legend, InfoDot } = NS;
+
+    const events = [
+      { x: 90, y: 44, type: 'shot', outcome: 'goal', xg: 0.71 },
+      { x: 84, y: 60, type: 'shot', outcome: 'saved', xg: 0.33 },
+      { x: 78, y: 36, type: 'shot', outcome: 'off_target', xg: 0.12 },
+      { x: 88, y: 50, type: 'shot', outcome: 'goal', xg: 0.55 },
+      { x: 62, y: 22, type: 'pass', outcome: 'complete' },
+      { x: 55, y: 70, type: 'pass', outcome: 'complete' },
+      { x: 47, y: 40, type: 'pass', outcome: 'incomplete' },
+      { x: 70, y: 84, type: 'dribble', outcome: 'complete' },
+      { x: 38, y: 58, type: 'tackle', outcome: 'won' },
+      { x: 30, y: 30, type: 'tackle', outcome: 'lost' },
+      { x: 52, y: 12, type: 'foul', outcome: 'conceded' },
+    ];
+    const rows = [
+      { player_name: 'R. Sottil', goals: 9, xg: 6.41, g_xg: 2.59, pass_pct: 81.4 },
+      { player_name: 'N. González', goals: 7, xg: 7.88, g_xg: -0.88, pass_pct: 76.2 },
+      { player_name: 'G. Bonaventura', goals: 6, xg: 4.02, g_xg: 1.98, pass_pct: 84.9 },
+      { player_name: 'A. Cabral', goals: 5, xg: 6.10, g_xg: -1.10, pass_pct: 72.0 },
+    ];
+
+    function Demo() {
+      return (
+        <div>
+          <div className="block">
+            <div className="lbl">Dropzone</div>
+            <Dropzone fileName="fiorentina_2025-26_events.csv" rowCount={48213} />
+          </div>
+          <div className="block">
+            <div className="lbl">KpiCard — scorecard row</div>
+            <div className="kpis">
+              <KpiCard label="Minuti" value="2.070" unit="′" />
+              <KpiCard label="Gol" value="9" delta="+2.6 vs xG" />
+              <KpiCard label="xG" value="6.41" hint={<InfoDot label="Gol attesi dalla qualità dei tiri." />} />
+              <KpiCard label="Gol − xG" value="+2.6" delta="sopra le attese" accent
+                hint={<InfoDot label="Finalizza sopra la qualità media dei suoi tiri." />} />
+              <KpiCard label="% Passaggi" value="81.4" unit="%" />
+              <KpiCard label="% Contrasti" value="63" unit="%" delta="-4 vs media" />
+            </div>
+          </div>
+          <div className="block">
+            <div className="lbl">PitchMap + Legend</div>
+            <div className="panel">
+              <PitchMap events={events} />
+              <div style={{ marginTop: 12 }}><Legend /></div>
+              <p style={{ font: 'var(--text-xs) var(--font-body)', color: 'var(--text-muted)', margin: '8px 0 0' }}>
+                Attacco verso destra → · la dimensione del tiro è proporzionale all'xG · il bordo bianco indica un gol.
+              </p>
+            </div>
+          </div>
+          <div className="block">
+            <div className="lbl">StatTable</div>
+            <div className="panel" style={{ padding: 0 }}>
+              <StatTable rank rows={rows} sortKey="goals" sortDir="desc"
+                columns={[
+                  { key: 'player_name', label: 'Giocatore', bold: true },
+                  { key: 'goals', label: 'Gol', align: 'right', mono: true },
+                  { key: 'xg', label: 'xG', align: 'right', mono: true, render: (v) => v.toFixed(2) },
+                  { key: 'g_xg', label: 'Gol − xG', align: 'right', mono: true, accent: true, render: (v) => (v > 0 ? '+' : '') + v.toFixed(2) },
+                  { key: 'pass_pct', label: '% Pass', align: 'right', mono: true, render: (v) => v.toFixed(1) + '%' },
+                ]} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Tema viola Fiorentina (palette ufficiale del design system).
+[theme]
+primaryColor = "#5C2D91"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F4FA"
+textColor = "#240E3D"
+font = "sans serif"
+
+# Serve i file in static/ come pagine vere (per incorporare la dashboard di design).
+[server]
+enableStaticServing = true

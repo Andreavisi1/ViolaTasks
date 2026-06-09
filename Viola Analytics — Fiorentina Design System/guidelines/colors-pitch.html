@@ -1,0 +1,35 @@
+<!-- @dsCard group="Colors" viewport="700x190" name="Pitch greens" subtitle="The field. Two mowing-stripe greens, lines, and a deep base." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-card); padding: 20px; }
+  .wrap { display:grid; grid-template-columns: 220px 1fr; gap:16px; align-items:stretch; }
+  .pitch { border-radius: var(--radius-md); position: relative; overflow:hidden; box-shadow: var(--shadow-sm); min-height: 120px;
+           background: repeating-linear-gradient(90deg, var(--pitch-grass-a) 0 24px, var(--pitch-grass-b) 24px 48px); }
+  .pitch::before { content:''; position:absolute; inset:10px; border:2px solid var(--pitch-line); border-radius:4px; }
+  .pitch::after { content:''; position:absolute; left:50%; top:10px; bottom:10px; width:2px; background:var(--pitch-line); transform:translateX(-50%); }
+  .circle { position:absolute; left:50%; top:50%; width:54px; height:54px; border:2px solid var(--pitch-line); border-radius:50%; transform:translate(-50%,-50%); }
+  .ramp { display:flex; flex-direction:column; gap:0; border-radius: var(--radius-md); overflow:hidden; box-shadow: var(--shadow-sm); }
+  .sw { flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 12px; min-height:24px; }
+  .sw span { font: var(--fw-semibold) 10px var(--font-mono); }
+  .sw small { font: 10px var(--font-mono); opacity:.85; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="pitch"><div class="circle"></div></div>
+    <div class="ramp" id="ramp"></div>
+  </div>
+  <script>
+    const root = getComputedStyle(document.documentElement);
+    const list = [['pitch-grass-a','stripe A'],['pitch-grass-b','stripe B'],['pitch-500','mid'],['pitch-600','deep'],['pitch-700','line bg'],['pitch-900','base']];
+    document.getElementById('ramp').innerHTML = list.map(([k,n]) => {
+      const v = root.getPropertyValue('--'+k).trim();
+      return `<div class="sw" style="background:${v};color:#fff"><span>${n}</span><small>${v}</small></div>`;
+    }).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Event types & status" subtitle="Categorical colors for pitch-map events + semantic status." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-card); padding: 20px; color: var(--text-primary); }
+  .block { margin-bottom: 16px; }
+  .t { font: var(--fw-semibold) var(--text-xs) var(--font-body); color: var(--text-secondary); margin-bottom: 8px; }
+  .chips { display:flex; flex-wrap:wrap; gap:10px; }
+  .chip { display:flex; align-items:center; gap:8px; padding:6px 12px 6px 8px; border:1px solid var(--border-subtle); border-radius: var(--radius-pill); background: var(--surface-card); box-shadow: var(--shadow-xs); }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .chip span { font: var(--fw-medium) var(--text-sm) var(--font-body); }
+  .chip small { font: 10px var(--font-mono); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="block">
+    <div class="t">Event types — pitch map &amp; legends</div>
+    <div class="chips" id="events"></div>
+  </div>
+  <div class="block">
+    <div class="t">Status — over/under-performance, won/lost, fouls</div>
+    <div class="chips" id="status"></div>
+  </div>
+  <script>
+    const root = getComputedStyle(document.documentElement);
+    const ev = [['ev-pass','Pass'],['ev-shot','Shot'],['ev-tackle','Tackle'],['ev-dribble','Dribble'],['ev-foul','Foul']];
+    const st = [['positive-500','Positive'],['warning-500','Warning'],['danger-500','Danger'],['accent-500','Accent']];
+    const render = (id,arr) => document.getElementById(id).innerHTML = arr.map(([k,n])=>{
+      const v = root.getPropertyValue('--'+k).trim();
+      return `<div class="chip"><span class="dot" style="background:${v}"></span><span>${n}</span><small>${v}</small></div>`;
+    }).join('');
+    render('events',ev); render('status',st);
+  </script>
+</body>
+</html>
