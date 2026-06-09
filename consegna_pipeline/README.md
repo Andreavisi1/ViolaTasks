@@ -4,19 +4,6 @@ Trasforma i JSON delle partite in dati puliti, tipizzati e interrogabili.
 È **incrementale**: rieseguire elabora solo le partite nuove o cambiate.
 Garanzia di **idempotenza**.
 
-## Requisiti minimi del brief — dove sono soddisfatti
-
-| Requisito | Dove |
-| --- | --- |
-| JSON → dati puliti, **tipizzati e ordinati** | `src/transform.py` (cast espliciti, eventi ordinati) → Parquet |
-| **Interrogabili** (conteggi/filtri) | `src/queries.py` · `python3 run.py --query` |
-| **Incrementale vero** (solo partite nuove o cambiate) | `src/pipeline.py` (hash SHA-256 + `_manifest.json`) |
-| Gestisce **lotto iniziale e di update** | `--initial` / `--update` (o `--all`) |
-| **Un comando + riproducibile** (breve README) | `./run.sh` / `.\run.ps1`; questo file |
-| **Codice in più moduli/funzioni** | `src/` (config · extract · transform · validation · load · pipeline · gold · queries · verify) |
-| *Opzionale* — una metrica implementata | xG in `src/queries.py` + `src/gold.py` |
-| *Opzionale* — test | `tests/` (11 test) + CI |
-
 ## Come si esegue
 
 Richiede **Python 3.9+**.
@@ -123,3 +110,16 @@ ogni push. I test verificano che il lotto iniziale carichi 24 partite, che
 l'update ne tocchi solo 5 (4 nuove + la 1003 corretta), che rieseguire non
 rielabori nulla, che i record malformati vengano rifiutati e che `verify` non
 trovi problemi.
+
+## Requisiti del brief: dove sono soddisfatti
+
+| Requisito | Dove |
+| --- | --- |
+| JSON → dati puliti, **tipizzati e ordinati** | `src/transform.py` (cast espliciti, eventi ordinati) → Parquet |
+| **Interrogabili** (conteggi/filtri) | `src/queries.py` · `python3 run.py --query` |
+| **Incrementale vero** (solo partite nuove o cambiate) | `src/pipeline.py` (hash SHA-256 + `_manifest.json`) |
+| Gestisce **lotto iniziale e di update** | `--initial` / `--update` (o `--all`) |
+| **Un comando + riproducibile** (breve README) | `./run.sh` / `.\run.ps1`; questo file |
+| **Codice in più moduli/funzioni** | `src/` (config · extract · transform · validation · load · pipeline · gold · queries · verify) |
+| *Opzionale* — una metrica implementata | xG in `src/queries.py` + `src/gold.py` |
+| *Opzionale* — test | `tests/` (11 test) + CI |
